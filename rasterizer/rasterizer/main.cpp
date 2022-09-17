@@ -2,25 +2,26 @@
 #include <iostream>
 #include <fstream>
 #include "BMPWriter.h"
+#include "Framebuffer.h"
 
 int main()
 {
-	PixelsData* pixelsData = new PixelsData[2];
+	Framebuffer framebuffer(800, 600);
+	Pixel* pixels = framebuffer.GetPixels();
+	Pixel* startOfArray = pixels;
 
-	pixelsData[0].rowOfPixels = new Pixel[2];
-	pixelsData[0].rowOfPixels[0] = Pixel(255, 0, 0);
-	pixelsData[0].rowOfPixels[1] = Pixel(255, 255, 255);
-
-	//---------------------------------------
-
-	pixelsData[1].rowOfPixels = new Pixel[2];
-	pixelsData[1].rowOfPixels[0] = Pixel(0, 0, 255);
-	pixelsData[1].rowOfPixels[1] = Pixel(0, 255, 0);
-
-	BMPImage bmpImage(2, 2, pixelsData);
+	for (size_t y = 0; y < framebuffer.GetHeight(); y++)
+	{
+		for (size_t x = 0; x < framebuffer.GetWidth(); x++)
+		{
+			*pixels = Pixel(255 - 1 * y, 255 - 1 * y, 255 - 1 * y);
+			pixels++;
+		}
+	}
+	pixels = startOfArray;
 
 	BMPWriter bmpWriter;
-	bmpWriter.WriteBMPFile(bmpImage);
+	bmpWriter.WriteBMPFile(framebuffer);
 
 	return 0;
 }

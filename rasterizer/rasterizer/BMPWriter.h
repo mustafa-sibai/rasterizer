@@ -1,22 +1,9 @@
 #pragma once
 #include <iostream>
 #include <fstream>
+#include "Pixel.h"
 
 #pragma pack(push,1)
-struct Pixel
-{
-	uint8_t r = 0;
-	uint8_t g = 0;
-	uint8_t b = 0;
-
-	Pixel() = default;
-
-	Pixel(const uint8_t& r, const uint8_t& g, const uint8_t& b) :
-		r(r), g(g), b(b)
-	{
-	}
-};
-
 struct DIPHeader
 {
 	int32_t dipHeaderSize = sizeof(DIPHeader);
@@ -47,20 +34,12 @@ struct BMPHeader
 	}
 };
 
-struct PixelsData
-{
-	Pixel* rowOfPixels = nullptr;
-	int16_t padding = 0;
-};
-
 struct BMPImage
 {
 	BMPHeader bmpHeader;
 	DIPHeader dipHeader;
-	PixelsData* pixelsData = nullptr;
 
-	BMPImage(int32_t imageWidth, int32_t imageHeight, PixelsData* pixelsData) :
-		pixelsData(pixelsData)
+	BMPImage(int32_t imageWidth, int32_t imageHeight)
 	{
 		dipHeader.imageWidth = imageWidth;
 		dipHeader.imageHeight = imageHeight;
@@ -76,5 +55,5 @@ struct BMPImage
 class BMPWriter
 {
 public:
-	void WriteBMPFile(BMPImage& bmp);
+	void WriteBMPFile(const class Framebuffer& framebuffer);
 };

@@ -1,7 +1,9 @@
 #include "BMPWriter.h"
+#include "Framebuffer.h"
 
-void BMPWriter::WriteBMPFile(BMPImage& bmp)
+void BMPWriter::WriteBMPFile(const Framebuffer& framebuffer)
 {
+	BMPImage bmp(framebuffer.GetWidth(), framebuffer.GetHeight());
 	bmp.bmpHeader.bmpFileSize = sizeof(BMPHeader) + sizeof(DIPHeader) + bmp.getPixelDataSize();
 	bmp.dipHeader.sizeOfRawBitmapDataWithPadding = bmp.getPixelDataSize();
 
@@ -28,15 +30,21 @@ void BMPWriter::WriteBMPFile(BMPImage& bmp)
 	file.write((char*)&bmp.dipHeader.colorsPerPalette, sizeof(bmp.dipHeader.colorsPerPalette));
 	file.write((char*)&bmp.dipHeader.importantColors, sizeof(bmp.dipHeader.importantColors));
 
+	const Pixel* pixel = framebuffer.GetPixels();
+
 	for (size_t y = 0; y < bmp.dipHeader.imageHeight; y++)
 	{
 		for (size_t x = 0; x < bmp.dipHeader.imageWidth; x++)
 		{
-			file.write((char*)&bmp.pixelsData[y].rowOfPixels[x].b, sizeof(bmp.pixelsData[y].rowOfPixels[x].b));
-			file.write((char*)&bmp.pixelsData[y].rowOfPixels[x].g, sizeof(bmp.pixelsData[y].rowOfPixels[x].g));
-			file.write((char*)&bmp.pixelsData[y].rowOfPixels[x].r, sizeof(bmp.pixelsData[y].rowOfPixels[x].r));
+			file.write((char*)&pixel->b, sizeof(pixel->b));
+			file.write((char*)&pixel->g, sizeof(pixel->g));
+			file.write((char*)&pixel->r, sizeof(pixel->r));
+
+			pixel++;
 		}
-		file.write((char*)&bmp.pixelsData[y].padding, sizeof(bmp.pixelsData[y].padding));
+
+		//uint16_t padding = 0; //Padding required by BMP file format spesification
+		//file.write((char*)&padding, sizeof(int16_t));
 	}
 
 	file.close();
